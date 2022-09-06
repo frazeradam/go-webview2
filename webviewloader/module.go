@@ -89,7 +89,7 @@ func GetInstalledVersion() (string, error) {
 		hr64, _, _ := memGetAvailableCoreWebView2BrowserVersionString.Call(
 			uint64(uintptr(unsafe.Pointer(nil))),
 			uint64(uintptr(unsafe.Pointer(&result))))
-		hr = uintptr(hr64) // The return size of the HRESULT will be whatver native size is (i.e uintptr) and not 64-bits on 32-bit systems
+		hr = uintptr(hr64) // The return size of the HRESULT will be whatver native size is (i.e uintptr) and not 64-bits on 32-bit systems.  In both cases it should be interpreted as 32-bits (a LONG).
 	} else {
 		hr, _, _ = nativeGetAvailableCoreWebView2BrowserVersionString.Call(
 			uintptr(unsafe.Pointer(nil)),
@@ -97,6 +97,10 @@ func GetInstalledVersion() (string, error) {
 	}
 	defer windows.CoTaskMemFree(unsafe.Pointer(result)) // Safe even if result is nil
 	if hr != 0 {
+		if hr&0xFFFF == uintptr(windows.ERROR_FILE_NOT_FOUND) {
+			// The lower 16-bits (the error code itself) of the HRESULT is ERROR_FILE_NOT_FOUND which means the system isn't installed.
+			return "", nil // Return a blank string but no error since we successfully detected no install.
+		}
 		return "", fmt.Errorf("GetAvailableCoreWebView2BrowserVersionString returned HRESULT 0x%X", hr)
 	}
 	version := windows.UTF16PtrToString(result) // Safe even if result is nil
