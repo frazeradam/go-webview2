@@ -96,7 +96,7 @@ func GetInstalledVersion() (string, error) {
 			uintptr(unsafe.Pointer(&result)))
 	}
 	defer windows.CoTaskMemFree(unsafe.Pointer(result)) // Safe even if result is nil
-	if hr != 0 {
+	if hr != uintptr(windows.S_OK) {
 		if hr&0xFFFF == uintptr(windows.ERROR_FILE_NOT_FOUND) {
 			// The lower 16-bits (the error code itself) of the HRESULT is ERROR_FILE_NOT_FOUND which means the system isn't installed.
 			return "", nil // Return a blank string but no error since we successfully detected no install.
