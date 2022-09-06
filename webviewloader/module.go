@@ -24,9 +24,10 @@ var (
 )
 
 // CompareBrowserVersions will compare the 2 given versions and return:
-//  -1 = v1 < v2
-//   0 = v1 == v2
-//   1 = v1 > v2
+//
+//	-1 = v1 < v2
+//	 0 = v1 == v2
+//	 1 = v1 > v2
 func CompareBrowserVersions(v1 string, v2 string) (int, error) {
 
 	_v1, err := windows.UTF16PtrFromString(v1)
@@ -82,7 +83,7 @@ func GetInstalledVersion() (string, error) {
 			uint64(uintptr(unsafe.Pointer(nil))),
 			uint64(uintptr(unsafe.Pointer(&result))))
 	} else {
-		_, _, err = nativeCompareBrowserVersions.Call(
+		_, _, err = nativeGetAvailableCoreWebView2BrowserVersionString.Call(
 			uintptr(unsafe.Pointer(nil)),
 			uintptr(unsafe.Pointer(&result)))
 	}
